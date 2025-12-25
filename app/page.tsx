@@ -25,7 +25,47 @@ export default function Home() {
   });
   const [sortBy, setSortBy] = useState<SortOption>("likes");
   const [hideTags, setHideTags] = useState<boolean>(true); // Default to hiding tags
+  const [hideSolved, setHideSolved] = useState<boolean>(false); // Default to showing solved
   const hasSyncedRef = useRef<Set<string>>(new Set()); // Track which usernames we've synced
+
+  // Load filters from localStorage
+  useEffect(() => {
+    const storedFilters = localStorage.getItem("leetcode_filters");
+    if (storedFilters) {
+      try {
+        const parsedFilters = JSON.parse(storedFilters);
+        setFilters({
+          difficulty: parsedFilters.difficulty || "All",
+          tags: parsedFilters.tags || [],
+          searchQuery: parsedFilters.searchQuery || "",
+        });
+      } catch (err) {
+        console.error("Error loading filters:", err);
+      }
+    }
+  }, []);
+
+  // Save filters to localStorage
+  useEffect(() => {
+    localStorage.setItem("leetcode_filters", JSON.stringify(filters));
+  }, [filters]);
+
+  // Load sortBy from localStorage
+  useEffect(() => {
+    const storedSortBy = localStorage.getItem("leetcode_sort_by");
+    if (storedSortBy) {
+      try {
+        setSortBy(storedSortBy as SortOption);
+      } catch (err) {
+        console.error("Error loading sortBy:", err);
+      }
+    }
+  }, []);
+
+  // Save sortBy to localStorage
+  useEffect(() => {
+    localStorage.setItem("leetcode_sort_by", sortBy);
+  }, [sortBy]);
 
   // Load hideTags preference from localStorage
   useEffect(() => {
@@ -40,6 +80,20 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem("leetcode_hide_tags", hideTags.toString());
   }, [hideTags]);
+
+  // Load hideSolved preference from localStorage
+  useEffect(() => {
+    const storedHideSolved = localStorage.getItem("leetcode_hide_solved");
+    if (storedHideSolved !== null) {
+      setHideSolved(storedHideSolved === "true");
+    }
+    // If no preference stored, default to false (show solved)
+  }, []);
+
+  // Save hideSolved preference to localStorage
+  useEffect(() => {
+    localStorage.setItem("leetcode_hide_solved", hideSolved.toString());
+  }, [hideSolved]);
 
   // Load solved problems from localStorage
   useEffect(() => {
@@ -252,9 +306,14 @@ export default function Home() {
         }
       }
 
+      // Hide solved filter - if hideSolved is true, exclude solved problems
+      if (hideSolved && solvedProblems.has(problem.questionId)) {
+        return false;
+      }
+
       return true;
     });
-  }, [problems, filters]);
+  }, [problems, filters, hideSolved, solvedProblems]);
 
   // Sort problems
   const sortedProblems = useMemo(() => {
@@ -361,6 +420,8 @@ export default function Home() {
               username={username}
               hideTags={hideTags}
               onHideTagsChange={setHideTags}
+              hideSolved={hideSolved}
+              onHideSolvedChange={setHideSolved}
             />
             {username && (
               <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
@@ -415,6 +476,8 @@ export default function Home() {
               username={username}
               hideTags={hideTags}
               onHideTagsChange={setHideTags}
+              hideSolved={hideSolved}
+              onHideSolvedChange={setHideSolved}
             />
             {username && (
               <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
@@ -465,6 +528,7 @@ export default function Home() {
                   isSolved={solvedProblems.has(problem.questionId)}
                   onToggleSolved={handleToggleSolved}
                   hideTags={hideTags}
+                  hideSolved={hideSolved}
                 />
               ))}
             </div>

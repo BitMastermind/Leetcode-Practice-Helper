@@ -14,6 +14,8 @@ interface FilterBarProps {
   username?: string | null;
   hideTags?: boolean;
   onHideTagsChange?: (hideTags: boolean) => void;
+  hideSolved?: boolean;
+  onHideSolvedChange?: (hideSolved: boolean) => void;
 }
 
 export default function FilterBar({
@@ -27,6 +29,8 @@ export default function FilterBar({
   username,
   hideTags = false,
   onHideTagsChange,
+  hideSolved = false,
+  onHideSolvedChange,
 }: FilterBarProps) {
   const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
@@ -177,45 +181,85 @@ export default function FilterBar({
         </div>
       </div>
 
-      {/* Show Tags Checkbox */}
-      {onHideTagsChange && (
-        <div className="mb-6">
-          <label className="flex items-center gap-3 cursor-pointer group">
-            <div className="relative">
-              <input
-                type="checkbox"
-                checked={!hideTags}
-                onChange={(e) => onHideTagsChange(!e.target.checked)}
-                className="sr-only"
-              />
-              <div
-                className={`w-5 h-5 rounded border-2 transition-all flex items-center justify-center ${
-                  !hideTags
-                    ? "bg-blue-500 border-blue-500"
-                    : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 group-hover:border-blue-400"
-                }`}
-              >
-                {!hideTags && (
-                  <svg
-                    className="w-3 h-3 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={3}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                )}
+      {/* Show Tags and Show Solved Checkboxes */}
+      {(onHideTagsChange || onHideSolvedChange) && (
+        <div className="mb-6 flex items-center gap-6">
+          {onHideTagsChange && (
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  checked={!hideTags}
+                  onChange={(e) => onHideTagsChange(!e.target.checked)}
+                  className="sr-only"
+                />
+                <div
+                  className={`w-5 h-5 rounded border-2 transition-all flex items-center justify-center ${
+                    !hideTags
+                      ? "bg-blue-500 border-blue-500"
+                      : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 group-hover:border-blue-400"
+                  }`}
+                >
+                  {!hideTags && (
+                    <svg
+                      className="w-3 h-3 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  )}
+                </div>
               </div>
-            </div>
-            <span className="text-sm text-gray-700 dark:text-gray-300 select-none">
-              Show tags
-            </span>
-          </label>
+              <span className="text-sm text-gray-700 dark:text-gray-300 select-none">
+                Show tags
+              </span>
+            </label>
+          )}
+          {onHideSolvedChange && (
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  checked={!hideSolved}
+                  onChange={(e) => onHideSolvedChange(!e.target.checked)}
+                  className="sr-only"
+                />
+                <div
+                  className={`w-5 h-5 rounded border-2 transition-all flex items-center justify-center ${
+                    !hideSolved
+                      ? "bg-blue-500 border-blue-500"
+                      : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 group-hover:border-blue-400"
+                  }`}
+                >
+                  {!hideSolved && (
+                    <svg
+                      className="w-3 h-3 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  )}
+                </div>
+              </div>
+              <span className="text-sm text-gray-700 dark:text-gray-300 select-none">
+                Show solved
+              </span>
+            </label>
+          )}
         </div>
       )}
 
